@@ -2289,22 +2289,59 @@
   <!-- consolidated script (no duplicate </script>) -->
   <script>
     // SORTING FUNCTION (preserved)
-    document.addEventListener("DOMContentLoaded", function() {
-      function sortByYear(containerId, itemClass) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        const items = Array.from(container.getElementsByClassName(itemClass));
-        items.sort((a,b) => {
-          const yearA = parseInt(a.querySelector(".project-year")?.textContent) || 0;
-          const yearB = parseInt(b.querySelector(".project-year")?.textContent) || 0;
-          return yearB - yearA;
-        });
-        items.forEach(item => container.appendChild(item));
-      }
-      sortByYear("projectsGrid", "project-card");
-      sortByYear("certificatesGrid", "certificate-card");
-      // (experience not sorted by year via class, kept as is)
+// SORTING FUNCTION (updated for certificates and timeline)
+document.addEventListener("DOMContentLoaded", function() {
+  // Function to extract year from certificate
+  function getCertYear(certElement) {
+    const text = certElement.querySelector(".cert-details p")?.textContent || "";
+    const match = text.match(/20\d{2}/); // finds 2024, 2025, 2026 etc.
+    return match ? parseInt(match[0]) : 0;
+  }
+  
+  // Function to extract year from timeline item
+  function getTimelineYear(timelineElement) {
+    const text = timelineElement.querySelector(".timeline-year")?.textContent || "";
+    const match = text.match(/20\d{2}/);
+    return match ? parseInt(match[0]) : 0;
+  }
+  
+  // Sort certificates
+  function sortCertificates() {
+    const container = document.getElementById("certificatesGrid");
+    if (!container) return;
+    
+    const items = Array.from(container.getElementsByClassName("certificate-card"));
+    items.sort((a, b) => {
+      const yearA = getCertYear(a);
+      const yearB = getCertYear(b);
+      return yearB - yearA; // newest first
     });
+    
+    items.forEach(item => container.appendChild(item));
+  }
+  
+  // Sort timeline/experience
+  function sortTimeline() {
+    const container = document.getElementById("timeline");
+    if (!container) return;
+    
+    const items = Array.from(container.getElementsByClassName("timeline-item"));
+    items.sort((a, b) => {
+      const yearA = getTimelineYear(a);
+      const yearB = getTimelineYear(b);
+      return yearB - yearA; // newest first
+    });
+    
+    items.forEach(item => container.appendChild(item));
+  }
+  
+  // Execute all sorting functions
+  sortCertificates();
+  sortTimeline();
+  
+  // Keep project sorting if needed (optional)
+  // sortByYear("projectsGrid", "project-card");
+});
 
     // loader, canvas, cursor, nav, theme, modal, tilt etc.
     (function initComplete() {
