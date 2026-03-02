@@ -2290,57 +2290,64 @@
   <script>
     // SORTING FUNCTION (preserved)
 // SORTING FUNCTION (updated for certificates and timeline)
+// COMPLETE SORTING FUNCTION for ALL sections
 document.addEventListener("DOMContentLoaded", function() {
-  // Function to extract year from certificate
-  function getCertYear(certElement) {
-    const text = certElement.querySelector(".cert-details p")?.textContent || "";
-    const match = text.match(/20\d{2}/); // finds 2024, 2025, 2026 etc.
-    return match ? parseInt(match[0]) : 0;
+  
+  // ----- FUNCTION FOR PROJECTS (using .project-year) -----
+  function sortProjects() {
+    const container = document.getElementById("projectsGrid");
+    if (!container) return;
+    
+    const items = Array.from(container.getElementsByClassName("project-card"));
+    items.sort((a, b) => {
+      const yearA = parseInt(a.querySelector(".project-year")?.textContent) || 0;
+      const yearB = parseInt(b.querySelector(".project-year")?.textContent) || 0;
+      return yearB - yearA; // newest first (2026, 2025, 2024...)
+    });
+    
+    items.forEach(item => container.appendChild(item));
   }
   
-  // Function to extract year from timeline item
-  function getTimelineYear(timelineElement) {
-    const text = timelineElement.querySelector(".timeline-year")?.textContent || "";
-    const match = text.match(/20\d{2}/);
-    return match ? parseInt(match[0]) : 0;
-  }
-  
-  // Sort certificates
+  // ----- FUNCTION FOR CERTIFICATES (looking in .cert-details p) -----
   function sortCertificates() {
     const container = document.getElementById("certificatesGrid");
     if (!container) return;
     
     const items = Array.from(container.getElementsByClassName("certificate-card"));
     items.sort((a, b) => {
-      const yearA = getCertYear(a);
-      const yearB = getCertYear(b);
-      return yearB - yearA; // newest first
+      // Extract year from text like "AWS · 2026" or "OutSkill · 2025"
+      const textA = a.querySelector(".cert-details p")?.textContent || "";
+      const textB = b.querySelector(".cert-details p")?.textContent || "";
+      const yearA = parseInt(textA.match(/20\d{2}/)?.[0] || "0");
+      const yearB = parseInt(textB.match(/20\d{2}/)?.[0] || "0");
+      return yearB - yearA;
     });
     
     items.forEach(item => container.appendChild(item));
   }
   
-  // Sort timeline/experience
+  // ----- FUNCTION FOR TIMELINE / PROFESSIONAL JOURNEY -----
   function sortTimeline() {
     const container = document.getElementById("timeline");
     if (!container) return;
     
     const items = Array.from(container.getElementsByClassName("timeline-item"));
     items.sort((a, b) => {
-      const yearA = getTimelineYear(a);
-      const yearB = getTimelineYear(b);
-      return yearB - yearA; // newest first
+      // Extract year from text like "Jan 2026 - Present" or "May 2025 - Jun 2025"
+      const textA = a.querySelector(".timeline-year")?.textContent || "";
+      const textB = b.querySelector(".timeline-year")?.textContent || "";
+      const yearA = parseInt(textA.match(/20\d{2}/)?.[0] || "0");
+      const yearB = parseInt(textB.match(/20\d{2}/)?.[0] || "0");
+      return yearB - yearA;
     });
     
     items.forEach(item => container.appendChild(item));
   }
   
-  // Execute all sorting functions
-  sortCertificates();
-  sortTimeline();
-  
-  // Keep project sorting if needed (optional)
-  // sortByYear("projectsGrid", "project-card");
+  // ----- EXECUTE ALL SORTING FUNCTIONS -----
+  sortProjects();        // Sorts projects by year
+  sortCertificates();    // Sorts certificates by year  
+  sortTimeline();        // Sorts professional journey by year
 });
 
     // loader, canvas, cursor, nav, theme, modal, tilt etc.
