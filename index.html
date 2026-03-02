@@ -2326,21 +2326,37 @@ document.addEventListener("DOMContentLoaded", function() {
     items.forEach(item => container.appendChild(item));
   }
   
-  // ----- FUNCTION FOR TIMELINE / PROFESSIONAL JOURNEY -----
+  // ----- FIXED FUNCTION FOR TIMELINE / PROFESSIONAL JOURNEY -----
   function sortTimeline() {
     const container = document.getElementById("timeline");
     if (!container) return;
     
     const items = Array.from(container.getElementsByClassName("timeline-item"));
+    
     items.sort((a, b) => {
-      // Extract year from text like "Jan 2026 - Present" or "May 2025 - Jun 2025"
-      const textA = a.querySelector(".timeline-year")?.textContent || "";
-      const textB = b.querySelector(".timeline-year")?.textContent || "";
-      const yearA = parseInt(textA.match(/20\d{2}/)?.[0] || "0");
-      const yearB = parseInt(textB.match(/20\d{2}/)?.[0] || "0");
-      return yearB - yearA;
+      // Get the timeline year elements
+      const yearElA = a.querySelector(".timeline-year");
+      const yearElB = b.querySelector(".timeline-year");
+      
+      if (!yearElA || !yearElB) return 0;
+      
+      const textA = yearElA.textContent || "";
+      const textB = yearElB.textContent || "";
+      
+      // Extract ALL years from the text (for date ranges)
+      const yearsA = textA.match(/20\d{2}/g) || [];
+      const yearsB = textB.match(/20\d{2}/g) || [];
+      
+      // For sorting, use the FIRST year mentioned (start date)
+      // This handles cases like "Jan 2026 - Present" or "May 2025 - Jun 2025"
+      const yearA = yearsA.length > 0 ? parseInt(yearsA[0]) : 0;
+      const yearB = yearsB.length > 0 ? parseInt(yearsB[0]) : 0;
+      
+      // If same year, we could add month sorting here if needed
+      return yearB - yearA; // Sort by start year, newest first
     });
     
+    // Clear and reappend in sorted order
     items.forEach(item => container.appendChild(item));
   }
   
